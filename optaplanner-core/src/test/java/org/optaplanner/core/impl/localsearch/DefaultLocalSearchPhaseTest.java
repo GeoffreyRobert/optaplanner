@@ -217,5 +217,4 @@ public class DefaultLocalSearchPhaseTest {
         assertEquals(0, solution.getEntityList().size());
     }
 
-
 }
