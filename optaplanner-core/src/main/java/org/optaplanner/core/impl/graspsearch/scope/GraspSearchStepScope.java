@@ -8,14 +8,12 @@ public class GraspSearchStepScope<Solution_> extends AbstractStepScope<Solution_
     private final GraspSearchPhaseScope<Solution_> phaseScope;
 
     private double timeGradient = Double.NaN;
+    private Solution_ step = null;
     private String stepString = null;
+    private Solution_ undoStep = null;
     private Long selectedMoveTotal = null;
     private Long acceptedMoveTotal = null;
-    /*
-    TODO private ?Search?<Solution_> = null;
-    TODO private ?Search?<Solution_> = null;
-    Certainement utilisé pour calculer des métriques sur benchmark
-    */
+    private boolean isLocal;
 
     public GraspSearchStepScope(GraspSearchPhaseScope<Solution_> phaseScope) {
         this(phaseScope, phaseScope.getNextStepIndex());
@@ -39,9 +37,9 @@ public class GraspSearchStepScope<Solution_> extends AbstractStepScope<Solution_
         this.timeGradient = timeGradient;
     }
 
-    // TODO public ?Search?<Solution_> getStep()
+    public Solution_ getStep() { return step; }
 
-    // TODO public void setStep(?Search?<Solution_> step)
+    public void setStep(Solution_ step) { this.step = step; }
 
     /**
      * @return null if logging level is to high
@@ -54,11 +52,11 @@ public class GraspSearchStepScope<Solution_> extends AbstractStepScope<Solution_
         this.stepString = stepString;
     }
 
-    /*
-    TODO public ?Search?<Solution_> getUndoStep()
+    public Solution_ getUndoStep() { return undoStep; }
 
-    TODO public void setUndoStep(?Search?<Solution_> undoStep)
-    */
+    public void setUndoStep(Solution_ undoStep) { this.undoStep = undoStep; }
+
+    public void defUndoStep() { phaseScope.getSolverScope().getWorkingSolution(); }
 
     public Long getSelectedMoveTotal() { return selectedMoveTotal; }
 

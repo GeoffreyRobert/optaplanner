@@ -62,41 +62,15 @@ public class DefaultGraspSearchPhase<Solution_> extends AbstractPhase<Solution_>
             stepScope.setTimeGradient(termination.calculatePhaseTimeGradient(phaseScope));
             stepStarted(stepScope);
             constructionHeuristicPhase.solve(solverScope);
+            // TODO termination avant que l'étape soit complétée
             localSearchPhase.solve(solverScope);
-            if (stepScope.getStep() == null) {
-                if (termination.isPhaseTerminated(phaseScope)) {
-                    logger.trace("{}    Step index ({}), time spent ({}) terminated without picking a nextStep.",
-                            logIndentation,
-                            stepScope.getStepIndex(),
-                            stepScope.getPhaseScope().calculateSolverTimeMillisSpentUpToNow());
-                } else if (stepScope.getSelectedMoveCount() == 0L) {
-                    logger.warn("{}    No doable selected move at step index ({}), time spent ({})."
-                                    + " Terminating phase early.",
-                            logIndentation,
-                            stepScope.getStepIndex(),
-                            stepScope.getPhaseScope().calculateSolverTimeMillisSpentUpToNow());
-                } else {
-                    throw new IllegalStateException("The step index (" + stepScope.getStepIndex()
-                            + ") has accepted/selected move count (" + stepScope.getAcceptedMoveCount() + "/"
-                            + stepScope.getSelectedMoveCount()
-                            + ") but failed to pick a nextStep (" + stepScope.getStep() + ").");
-                }
-                // Although stepStarted has been called, stepEnded is not called for this step
-                break;
-            }
-            doStep(stepScope);
+            Solution_ step = stepScope.getStep();
+            predictWorkingStepScore(stepScope, step);
+            bestSolutionRecaller.processWorkingSolutionDuringStep(stepScope);
             stepEnded(stepScope);
             phaseScope.setLastCompletedStepScope(stepScope);
         }
         phaseEnded(phaseScope);
-    }
-
-    protected void doStep(GraspSearchStepScope<Solution_> stepScope) {
-        Move<Solution_> step = stepScope.getStep();
-        Move<Solution_> undoStep = step.doMove(stepScope.getScoreDirector());
-        stepScope.setUndoStep(undoStep);
-        predictWorkingStepScore(stepScope, step);
-        bestSolutionRecaller.processWorkingSolutionDuringStep(stepScope);
     }
 
     @Override
@@ -114,6 +88,7 @@ public class DefaultGraspSearchPhase<Solution_> extends AbstractPhase<Solution_>
     @Override
     public void stepStarted(GraspSearchStepScope<Solution_> stepScope) {
         super.stepStarted(stepScope);
+        stepScope.defUndoStep();
     }
 
     @Override
