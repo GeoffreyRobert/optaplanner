@@ -1,0 +1,18 @@
+<solver>
+  <solutionClass>org.optaplanner.core.impl.testdata.domain.TestdataSolution</solutionClass>
+  <entityClass>org.optaplanner.core.impl.testdata.domain.TestdataEntity</entityClass>
+  <scoreDirectorFactory>
+    <scoreDrl>org/optaplanner/core/api/solver/testdataScoreRules.drl</scoreDrl>
+  </scoreDirectorFactory>
+  <termination>
+    <secondsSpentLimit>60</secondsSpentLimit>
+  </termination>
+  <localSearch>
+    <acceptor>
+      <acceptorType>HILL_CLIMBING</acceptorType>
+    </acceptor>
+    <forager>
+      <acceptedCountLimit>1</acceptedCountLimit>
+    </forager>
+  </localSearch>
+</solver>
