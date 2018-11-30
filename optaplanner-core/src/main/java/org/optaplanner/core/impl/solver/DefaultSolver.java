@@ -16,6 +16,7 @@
 
 package org.optaplanner.core.impl.solver;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -53,6 +54,7 @@ public class DefaultSolver<Solution_> extends AbstractSolver<Solution_> {
     protected final AtomicBoolean solving = new AtomicBoolean(false);
 
     protected final DefaultSolverScope<Solution_> solverScope;
+    protected final List<Phase<Solution_>> phaseList;
 
     // ************************************************************************
     // Constructors and simple getters/setters
@@ -62,7 +64,11 @@ public class DefaultSolver<Solution_> extends AbstractSolver<Solution_> {
             BestSolutionRecaller<Solution_> bestSolutionRecaller, BasicPlumbingTermination basicPlumbingTermination, Termination termination,
             List<Phase<Solution_>> phaseList,
             DefaultSolverScope<Solution_> solverScope) {
-        super(bestSolutionRecaller, termination, phaseList);
+        super(bestSolutionRecaller, termination);
+        this.phaseList = phaseList;
+        for (Phase<Solution_> phase : phaseList) {
+            phase.setSolverPhaseLifecycleSupport(phaseLifecycleSupport);
+        }
         this.environmentMode = environmentMode;
         this.randomFactory = randomFactory;
         this.basicPlumbingTermination = basicPlumbingTermination;
@@ -196,6 +202,18 @@ public class DefaultSolver<Solution_> extends AbstractSolver<Solution_> {
         return solverScope.getBestSolution();
     }
 
+    protected void runPhases(DefaultSolverScope<Solution_> solverScope) {
+        Iterator<Phase<Solution_>> it = phaseList.iterator();
+        while (!termination.isSolverTerminated(solverScope) && it.hasNext()) {
+            Phase<Solution_> phase = it.next();
+            phase.solve(solverScope);
+            if (it.hasNext()) {
+                solverScope.setWorkingSolutionFromBestSolution();
+            }
+        }
+        // TODO support doing round-robin of phases (only non-construction heuristics)
+    }
+
     public void outerSolvingStarted(DefaultSolverScope<Solution_> solverScope) {
         solving.set(true);
         basicPlumbingTermination.resetTerminateEarly();
@@ -208,6 +226,9 @@ public class DefaultSolver<Solution_> extends AbstractSolver<Solution_> {
         solverScope.startingNow();
         solverScope.getScoreDirector().resetCalculationCount();
         super.solvingStarted(solverScope);
+        for (Phase<Solution_> phase : phaseList) {
+            phase.solvingStarted(solverScope);
+        }
         int startingSolverCount = solverScope.getStartingSolverCount() + 1;
         solverScope.setStartingSolverCount(startingSolverCount);
         logger.info("Solving {}: time spent ({}), best score ({}), environment mode ({}), random ({}).",
@@ -220,6 +241,9 @@ public class DefaultSolver<Solution_> extends AbstractSolver<Solution_> {
 
     @Override
     public void solvingEnded(DefaultSolverScope<Solution_> solverScope) {
+        for (Phase<Solution_> phase : phaseList) {
+            phase.solvingEnded(solverScope);
+        }
         super.solvingEnded(solverScope);
         solverScope.endingNow();
     }

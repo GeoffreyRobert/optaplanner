@@ -1,4 +1,4 @@
-package org.optaplanner.core.config.graspsearch;
+package org.optaplanner.core.config.hypersolver;
 
 
 import java.io.IOException;

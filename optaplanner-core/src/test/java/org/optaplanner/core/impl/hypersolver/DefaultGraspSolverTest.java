@@ -1,4 +1,4 @@
-package org.optaplanner.core.impl.graspsearch;
+package org.optaplanner.core.impl.hypersolver;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -6,7 +6,7 @@ import java.util.Collections;
 import org.junit.Test;
 import org.optaplanner.core.api.solver.Solver;
 import org.optaplanner.core.api.solver.SolverFactory;
-import org.optaplanner.core.config.graspsearch.GraspSearchPhaseConfig;
+import org.optaplanner.core.config.hypersolver.GraspSearchPhaseConfig;
 import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.optaplanner.core.impl.testdata.domain.TestdataEntity;
 import org.optaplanner.core.impl.testdata.domain.TestdataSolution;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.optaplanner.core.impl.testdata.util.PlannerAssert.*;
 
-public class DefaultGraspSearchPhaseTest {
+public class DefaultGraspSolverTest {
 
     @Test
     public void solveWithInitializedEntities() {
