@@ -16,6 +16,7 @@
 
 package org.optaplanner.core.impl.partitionedsearch;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.optaplanner.core.api.domain.solution.PlanningSolution;
@@ -34,6 +35,7 @@ import org.optaplanner.core.impl.solver.termination.Termination;
 public class PartitionSolver<Solution_> extends AbstractSolver<Solution_> {
 
     protected final DefaultSolverScope<Solution_> solverScope;
+    protected final List<Phase<Solution_>> phaseList;
 
     // ************************************************************************
     // Constructors and simple getters/setters
@@ -41,8 +43,12 @@ public class PartitionSolver<Solution_> extends AbstractSolver<Solution_> {
 
     public PartitionSolver(BestSolutionRecaller<Solution_> bestSolutionRecaller, Termination termination,
             List<Phase<Solution_>> phaseList, DefaultSolverScope<Solution_> solverScope) {
-        super(bestSolutionRecaller, termination, phaseList);
+        super(bestSolutionRecaller, termination);
         this.solverScope = solverScope;
+        this.phaseList = phaseList;
+        for (Phase<Solution_> phase : phaseList) {
+            phase.setSolverPhaseLifecycleSupport(phaseLifecycleSupport);
+        }
     }
 
     @Override
@@ -124,6 +130,18 @@ public class PartitionSolver<Solution_> extends AbstractSolver<Solution_> {
         } finally {
             solverScope.destroyYielding();
         }
+    }
+
+    protected void runPhases(DefaultSolverScope<Solution_> solverScope) {
+        Iterator<Phase<Solution_>> it = phaseList.iterator();
+        while (!termination.isSolverTerminated(solverScope) && it.hasNext()) {
+            Phase<Solution_> phase = it.next();
+            phase.solve(solverScope);
+            if (it.hasNext()) {
+                solverScope.setWorkingSolutionFromBestSolution();
+            }
+        }
+        // TODO support doing round-robin of phases (only non-construction heuristics)
     }
 
     @Override

@@ -50,21 +50,15 @@ public abstract class AbstractSolver<Solution_> implements Solver<Solution_> {
     protected final BestSolutionRecaller<Solution_> bestSolutionRecaller;
     // Note that the DefaultSolver.basicPlumbingTermination is a component of this termination
     protected final Termination termination;
-    protected final List<Phase<Solution_>> phaseList;
 
     // ************************************************************************
     // Constructors and simple getters/setters
     // ************************************************************************
 
-    public AbstractSolver(BestSolutionRecaller<Solution_> bestSolutionRecaller, Termination termination,
-            List<Phase<Solution_>> phaseList) {
+    public AbstractSolver(BestSolutionRecaller<Solution_> bestSolutionRecaller, Termination termination) {
         this.bestSolutionRecaller = bestSolutionRecaller;
         this.termination = termination;
         bestSolutionRecaller.setSolverEventSupport(solverEventSupport);
-        this.phaseList = phaseList;
-        for (Phase<Solution_> phase : phaseList) {
-            phase.setSolverPhaseLifecycleSupport(phaseLifecycleSupport);
-        }
     }
 
     // ************************************************************************
@@ -76,27 +70,9 @@ public abstract class AbstractSolver<Solution_> implements Solver<Solution_> {
         bestSolutionRecaller.solvingStarted(solverScope);
         termination.solvingStarted(solverScope);
         phaseLifecycleSupport.fireSolvingStarted(solverScope);
-        for (Phase<Solution_> phase : phaseList) {
-            phase.solvingStarted(solverScope);
-        }
-    }
-
-    protected void runPhases(DefaultSolverScope<Solution_> solverScope) {
-        Iterator<Phase<Solution_>> it = phaseList.iterator();
-        while (!termination.isSolverTerminated(solverScope) && it.hasNext()) {
-            Phase<Solution_> phase = it.next();
-            phase.solve(solverScope);
-            if (it.hasNext()) {
-                solverScope.setWorkingSolutionFromBestSolution();
-            }
-        }
-        // TODO support doing round-robin of phases (only non-construction heuristics)
     }
 
     public void solvingEnded(DefaultSolverScope<Solution_> solverScope) {
-        for (Phase<Solution_> phase : phaseList) {
-            phase.solvingEnded(solverScope);
-        }
         phaseLifecycleSupport.fireSolvingEnded(solverScope);
         termination.solvingEnded(solverScope);
         bestSolutionRecaller.solvingEnded(solverScope);
