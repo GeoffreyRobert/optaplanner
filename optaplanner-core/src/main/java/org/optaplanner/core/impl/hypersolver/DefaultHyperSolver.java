@@ -55,10 +55,10 @@ public class DefaultHyperSolver<Solution_> extends DefaultSolver<Solution_> {
     @Override
     public void runPhases(DefaultSolverScope<Solution_> solverScope) {
         while (!termination.isSolverTerminated(solverScope)) {
-            Phase<Solution_> phase = switcher.switchToNextPhase(solverScope);
-            // TODO gérer la récupération de data pour le learner
+            Phase<Solution_> phase = switcher.switchToNextPhase((HyperSolverScope<Solution_>)solverScope);
+            // TODO gérer la récupération de data pour le evaluator
             phase.solve(solverScope);
-            switcher.processNewPhase(solverScope);
+            switcher.processNewPhase((HyperSolverScope<Solution_>)solverScope);
         }
     }
 

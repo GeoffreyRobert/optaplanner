@@ -6,6 +6,7 @@ import org.optaplanner.core.impl.solver.scope.DefaultSolverScope;
 public class HyperSolverScope<Solution_> extends DefaultSolverScope {
 
     protected volatile Solution_ restartSolution;
+    protected long evaluationCount;
 
     // ************************************************************************
     // Constructors and simple getters/setters
@@ -25,12 +26,20 @@ public class HyperSolverScope<Solution_> extends DefaultSolverScope {
         this.bestSolution = bestSolution;
     }
 
+    public long getEvaluationCount() { return evaluationCount; }
+
+    public void setEvaluationCount(long evaluationCount) { this.evaluationCount = evaluationCount; }
+
     // ************************************************************************
     // Calculated methods
     // ************************************************************************
 
     public void setRestartSolutionFromBestSolution() {
         // The workingSolution must never be the same instance as the bestSolution.
+        restartSolution = (Solution_)scoreDirector.cloneSolution(bestSolution);
+    }
+
+    public void setWorkingSolutionFromRestartSolution() {
         scoreDirector.setWorkingSolution(scoreDirector.cloneSolution(restartSolution));
     }
 

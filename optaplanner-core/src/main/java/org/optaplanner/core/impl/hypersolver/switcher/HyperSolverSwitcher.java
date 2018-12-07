@@ -1,6 +1,7 @@
 package org.optaplanner.core.impl.hypersolver.switcher;
 
-import org.optaplanner.core.impl.hypersolver.switcher.learner.Learner;
+import org.optaplanner.core.impl.hypersolver.scope.HyperSolverScope;
+import org.optaplanner.core.impl.hypersolver.switcher.evaluator.Evaluator;
 import org.optaplanner.core.impl.hypersolver.switcher.explorer.Explorer;
 import org.optaplanner.core.impl.phase.Phase;
 import org.optaplanner.core.impl.solver.scope.DefaultSolverScope;
@@ -16,14 +17,14 @@ public class HyperSolverSwitcher<Solution_> {
 
     protected final String logIndentation;
     protected final Termination termination;
-    protected final Learner learner;
+    protected final Evaluator evaluator;
     protected final Explorer explorer;
 
     public HyperSolverSwitcher(String logIndentation, Termination termination,
-                               Learner learner, Explorer explorer) {
+                               Evaluator evaluator, Explorer explorer) {
         this.logIndentation = logIndentation;
         this.termination = termination;
-        this.learner = learner;
+        this.evaluator = evaluator;
         this.explorer = explorer;
     }
 
@@ -31,8 +32,8 @@ public class HyperSolverSwitcher<Solution_> {
         return termination;
     }
 
-    public Learner getLearner() {
-        return learner;
+    public Evaluator getEvaluator() {
+        return evaluator;
     }
 
     public Explorer getExplorer() {
@@ -44,22 +45,19 @@ public class HyperSolverSwitcher<Solution_> {
     // ************************************************************************
 
     public void solvingStarted(DefaultSolverScope<Solution_> solverScope) {
-        learner.solvingStarted(solverScope);
         explorer.solvingStarted(solverScope);
     }
 
-    public void processNewPhase(DefaultSolverScope<Solution_> solverScope) {
-        learner.learnOnLastPhase(solverScope);
+    public void processNewPhase(HyperSolverScope<Solution_> solverScope) {
+        evaluator.evaluateLastPhase(solverScope);
         explorer.resetSolution(solverScope);
     }
 
-    public Phase<Solution_> switchToNextPhase(DefaultSolverScope<Solution_> solverScope) {
-        List<Phase> phases = learner.proposePhases(solverScope);
-        return explorer.pickNextPhase(solverScope, phases);
+    public Phase<Solution_> switchToNextPhase(HyperSolverScope<Solution_> solverScope) {
+        return explorer.pickNextPhase(solverScope);
     }
 
     public void solvingEnded(DefaultSolverScope<Solution_> solverScope) {
-        learner.solvingEnded(solverScope);
         explorer.solvingEnded(solverScope);
     }
 
