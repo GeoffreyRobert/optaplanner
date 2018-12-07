@@ -9,8 +9,6 @@ import org.optaplanner.core.impl.solver.termination.Termination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 public class HyperSolverSwitcher<Solution_> {
 
     protected final transient Logger logger = LoggerFactory.getLogger(getClass());

@@ -23,8 +23,7 @@ public class DefaultHyperSolver<Solution_> extends DefaultSolver<Solution_> {
 
     public DefaultHyperSolver(EnvironmentMode environmentMode, RandomFactory randomFactory,
                          BestSolutionRecaller<Solution_> bestSolutionRecaller, BasicPlumbingTermination basicPlumbingTermination, Termination termination,
-                         List<Phase<Solution_>> phaseList, HyperSolverScope<Solution_> solverScope,
-                         HyperSolverSwitcher<Solution_> switcher) {
+                              HyperSolverSwitcher<Solution_> switcher, HyperSolverScope<Solution_> solverScope) {
         super(environmentMode, randomFactory, bestSolutionRecaller, basicPlumbingTermination, termination,
                 null, solverScope);
         this.switcher = switcher;
