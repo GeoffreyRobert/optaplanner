@@ -75,7 +75,7 @@ public class HyperSolverConfig extends AbstractConfig<SolverConfig> {
     @XStreamAlias("explorer")
     private TerminationConfig terminationConfig;
 
-    @XStreamAlias("learner")
+    @XStreamAlias("evaluator")
     private TerminationConfig terminationConfig;
 
     // ************************************************************************
