@@ -109,7 +109,7 @@ public class HyperSolverConfig extends SolverConfig {
 
     protected <Solution_> HyperSolverSwitcher<Solution_> buildSwitcher(HeuristicConfigPolicy configPolicy,
             BestSolutionRecaller bestSolutionRecaller, Termination termination) {
-        
+
     }
 
     @Override
