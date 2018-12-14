@@ -8,6 +8,8 @@ import org.optaplanner.core.config.SolverConfigContext;
 import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicPhaseConfig;
 import org.optaplanner.core.config.domain.ScanAnnotatedClassesConfig;
 import org.optaplanner.core.config.heuristic.policy.HeuristicConfigPolicy;
+import org.optaplanner.core.config.hypersolver.switcher.evaluator.EvaluatorConfig;
+import org.optaplanner.core.config.hypersolver.switcher.explorer.ExplorerConfig;
 import org.optaplanner.core.config.localsearch.LocalSearchPhaseConfig;
 import org.optaplanner.core.config.phase.PhaseConfig;
 import org.optaplanner.core.config.score.director.ScoreDirectorFactoryConfig;
@@ -22,6 +24,8 @@ import org.optaplanner.core.impl.domain.solution.descriptor.SolutionDescriptor;
 import org.optaplanner.core.impl.hypersolver.DefaultHyperSolver;
 import org.optaplanner.core.impl.hypersolver.scope.HyperSolverScope;
 import org.optaplanner.core.impl.hypersolver.switcher.HyperSolverSwitcher;
+import org.optaplanner.core.impl.hypersolver.switcher.evaluator.Evaluator;
+import org.optaplanner.core.impl.hypersolver.switcher.explorer.Explorer;
 import org.optaplanner.core.impl.phase.Phase;
 import org.optaplanner.core.impl.score.definition.ScoreDefinition;
 import org.optaplanner.core.impl.score.director.InnerScoreDirectorFactory;
@@ -45,8 +49,10 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 @XStreamAlias("hyperSolver")
 public class HyperSolverConfig extends SolverConfig {
 
-    @XStreamAlias("switcher")
-    private SwitcherConfig switcherConfig;
+    @XStreamAlias("evaluator")
+    private EvaluatorConfig evaluatorConfig;
+    @XStreamAlias("explorer")
+    private ExplorerConfig explorerConfig;
 
     // ************************************************************************
     // Constructors and simple getters/setters
@@ -59,12 +65,20 @@ public class HyperSolverConfig extends SolverConfig {
         super(inheritedConfig);
     }
 
-    public SwitcherConfig getSwitcherConfig() {
-        return switcherConfig;
+    public EvaluatorConfig getEvaluatorConfig() {
+        return evaluatorConfig;
     }
 
-    public void setSwitcherConfig(SwitcherConfig switcherConfig) {
-        this.switcherConfig = switcherConfig;
+    public void setEvaluatorConfig(EvaluatorConfig switcherConfig) {
+        this.evaluatorConfig = switcherConfig;
+    }
+
+    public ExplorerConfig getExplorerConfig() {
+        return explorerConfig;
+    }
+
+    public void setExplorerConfig(ExplorerConfig explorerConfig) {
+        this.explorerConfig = explorerConfig;
     }
 
     // ************************************************************************
@@ -76,7 +90,7 @@ public class HyperSolverConfig extends SolverConfig {
      * @return never null
      */
     @Override
-    public <Solution_> Solver<Solution_> buildSolver(SolverConfigContext configContext) {
+    public <Solution_> DefaultHyperSolver<Solution_> buildSolver(SolverConfigContext configContext) {
         configContext.validate();
         EnvironmentMode environmentMode_ = determineEnvironmentMode();
         boolean daemon_ = defaultIfNull(daemon, false);
@@ -90,7 +104,7 @@ public class HyperSolverConfig extends SolverConfig {
         InnerScoreDirectorFactory<Solution_> scoreDirectorFactory = scoreDirectorFactoryConfig_.buildScoreDirectorFactory(
                 configContext, environmentMode_, solutionDescriptor);
         boolean constraintMatchEnabledPreference = environmentMode_.isAsserted();
-        DefaultSolverScope<Solution_> solverScope = new DefaultSolverScope<>();
+        HyperSolverScope<Solution_> solverScope = new HyperSolverScope<>();
         solverScope.setScoreDirector(scoreDirectorFactory.buildScoreDirector(true, constraintMatchEnabledPreference));
 
         BestSolutionRecaller<Solution_> bestSolutionRecaller = new BestSolutionRecallerConfig()
@@ -109,13 +123,18 @@ public class HyperSolverConfig extends SolverConfig {
 
     protected <Solution_> HyperSolverSwitcher<Solution_> buildSwitcher(HeuristicConfigPolicy configPolicy,
             BestSolutionRecaller bestSolutionRecaller, Termination termination) {
-
+        Evaluator evaluator = evaluatorConfig.buildEvaluator(configPolicy); // TODO check les arguments
+        Explorer explorer = explorerConfig.buildExplorer(configPolicy, bestSolutionRecaller, termination);
+        HyperSolverSwitcher switcher = new HyperSolverSwitcher(configPolicy.getLogIndentation(),
+                termination, evaluator, explorer);
+        return switcher;
     }
 
     @Override
     public void inherit(SolverConfig inheritedConfig) {
         super.inherit(inheritedConfig);
-        switcherConfig = ConfigUtils.inheritConfig(switcherConfig, ((HyperSolverConfig)inheritedConfig).getSwitcherConfig())
+        evaluatorConfig = ConfigUtils.inheritConfig(evaluatorConfig, ((HyperSolverConfig)inheritedConfig).getEvaluatorConfig());
+        explorerConfig = ConfigUtils.inheritConfig(explorerConfig, ((HyperSolverConfig)inheritedConfig).getExplorerConfig());
     }
 
 }

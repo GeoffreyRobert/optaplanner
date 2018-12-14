@@ -1,9 +1,15 @@
 package org.optaplanner.core.impl.hypersolver.switcher.explorer.grasp;
 
+import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicPhaseConfig;
+import org.optaplanner.core.config.heuristic.policy.HeuristicConfigPolicy;
+import org.optaplanner.core.config.localsearch.LocalSearchPhaseConfig;
 import org.optaplanner.core.impl.hypersolver.scope.HyperSolverScope;
 import org.optaplanner.core.impl.hypersolver.switcher.explorer.Explorer;
 import org.optaplanner.core.impl.phase.Phase;
+import org.optaplanner.core.impl.phase.event.PhaseLifecycleSupport;
+import org.optaplanner.core.impl.solver.recaller.BestSolutionRecaller;
 import org.optaplanner.core.impl.solver.scope.DefaultSolverScope;
+import org.optaplanner.core.impl.solver.termination.Termination;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +20,16 @@ public class GraspExplorer<Solution_> implements Explorer<Solution_> {
     private Phase<Solution_> construction;
     private Phase<Solution_> local;
 
-    public GraspExplorer() {}
+    public GraspExplorer(HeuristicConfigPolicy configPolicy,
+                         BestSolutionRecaller bestSolutionRecaller,
+                         Termination termination) {
+        ConstructionHeuristicPhaseConfig constructionHeuristicPhaseConfig = new ConstructionHeuristicPhaseConfig();
+        this.construction = constructionHeuristicPhaseConfig.buildPhase(0, configPolicy,
+                bestSolutionRecaller, termination);
+        LocalSearchPhaseConfig localSearchPhaseConfig = new LocalSearchPhaseConfig();
+        this.local = localSearchPhaseConfig.buildPhase(1, configPolicy,
+                bestSolutionRecaller, termination);
+    }
 
     public Phase<Solution_> getConstruction() {
         return construction;
@@ -30,6 +45,15 @@ public class GraspExplorer<Solution_> implements Explorer<Solution_> {
 
     public void setLocal(Phase<Solution_> local) {
         this.local = local ;
+    }
+
+    // ************************************************************************
+    // Worker methods
+    // ************************************************************************
+
+    public void setSolverPhaseLifecycleSupport(PhaseLifecycleSupport<Solution_> solverPhaseLifecycleSupport) {
+        construction.setSolverPhaseLifecycleSupport(solverPhaseLifecycleSupport);
+        local.setSolverPhaseLifecycleSupport(solverPhaseLifecycleSupport);
     }
 
     public Phase<Solution_> pickNextPhase(HyperSolverScope<Solution_> solverScope) {

@@ -1,5 +1,6 @@
 package org.optaplanner.core.impl.hypersolver;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.optaplanner.core.config.solver.EnvironmentMode;
@@ -25,8 +26,9 @@ public class DefaultHyperSolver<Solution_> extends DefaultSolver<Solution_> {
                          BestSolutionRecaller<Solution_> bestSolutionRecaller, BasicPlumbingTermination basicPlumbingTermination, Termination termination,
                               HyperSolverSwitcher<Solution_> switcher, HyperSolverScope<Solution_> solverScope) {
         super(environmentMode, randomFactory, bestSolutionRecaller, basicPlumbingTermination, termination,
-                null, solverScope);
+                new ArrayList<Phase<Solution_>>(), solverScope);
         this.switcher = switcher;
+        switcher.setSolverPhaseLifecycleSupport(phaseLifecycleSupport);
     }
 
     public HyperSolverSwitcher<Solution_> getSwitcher() {
