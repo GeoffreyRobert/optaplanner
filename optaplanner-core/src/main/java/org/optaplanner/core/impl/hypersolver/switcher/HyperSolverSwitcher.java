@@ -4,6 +4,7 @@ import org.optaplanner.core.impl.hypersolver.scope.HyperSolverScope;
 import org.optaplanner.core.impl.hypersolver.switcher.evaluator.Evaluator;
 import org.optaplanner.core.impl.hypersolver.switcher.explorer.Explorer;
 import org.optaplanner.core.impl.phase.Phase;
+import org.optaplanner.core.impl.phase.event.PhaseLifecycleSupport;
 import org.optaplanner.core.impl.solver.scope.DefaultSolverScope;
 import org.optaplanner.core.impl.solver.termination.Termination;
 import org.slf4j.Logger;
@@ -41,6 +42,10 @@ public class HyperSolverSwitcher<Solution_> {
     // ************************************************************************
     // Worker methods
     // ************************************************************************
+
+    public void setSolverPhaseLifecycleSupport(PhaseLifecycleSupport<Solution_> solverPhaseLifecycleSupport) {
+        this.explorer.setSolverPhaseLifecycleSupport(solverPhaseLifecycleSupport);
+    }
 
     public void solvingStarted(DefaultSolverScope<Solution_> solverScope) {
         explorer.solvingStarted(solverScope);
