@@ -20,10 +20,10 @@ public class HyperSolverScope<Solution_> extends DefaultSolverScope {
      * The {@link PlanningSolution restart solution} must never be the same instance
      * as the {@link PlanningSolution working solution} or {@link PlanningSolution best
      * solution} it should be a (un)changed clone.
-     * @param bestSolution never null
+     * @param restartSolution never null
      */
-    public void setRestartSolution(Solution_ bestSolution) {
-        this.bestSolution = bestSolution;
+    public void setRestartSolution(Solution_ restartSolution) {
+        this.restartSolution = restartSolution;
     }
 
     public long getEvaluationCount() { return evaluationCount; }

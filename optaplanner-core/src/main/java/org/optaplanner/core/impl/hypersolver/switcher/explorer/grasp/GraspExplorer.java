@@ -3,6 +3,7 @@ package org.optaplanner.core.impl.hypersolver.switcher.explorer.grasp;
 import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicPhaseConfig;
 import org.optaplanner.core.config.heuristic.policy.HeuristicConfigPolicy;
 import org.optaplanner.core.config.localsearch.LocalSearchPhaseConfig;
+import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.optaplanner.core.impl.hypersolver.scope.HyperSolverScope;
 import org.optaplanner.core.impl.hypersolver.switcher.explorer.Explorer;
 import org.optaplanner.core.impl.phase.Phase;
@@ -22,13 +23,14 @@ public class GraspExplorer<Solution_> implements Explorer<Solution_> {
 
     public GraspExplorer(HeuristicConfigPolicy configPolicy,
                          BestSolutionRecaller bestSolutionRecaller,
-                         Termination termination) {
+                         Termination solverTermination) {
         ConstructionHeuristicPhaseConfig constructionHeuristicPhaseConfig = new ConstructionHeuristicPhaseConfig();
         this.construction = constructionHeuristicPhaseConfig.buildPhase(0, configPolicy,
-                bestSolutionRecaller, termination);
+                bestSolutionRecaller, solverTermination);
         LocalSearchPhaseConfig localSearchPhaseConfig = new LocalSearchPhaseConfig();
+        localSearchPhaseConfig.setTerminationConfig(new TerminationConfig().withUnimprovedStepCountLimit(10));
         this.local = localSearchPhaseConfig.buildPhase(1, configPolicy,
-                bestSolutionRecaller, termination);
+                bestSolutionRecaller, solverTermination);
     }
 
     public Phase<Solution_> getConstruction() {
@@ -73,6 +75,8 @@ public class GraspExplorer<Solution_> implements Explorer<Solution_> {
 
     public void solvingStarted(DefaultSolverScope<Solution_> solverScope) {
         localPhase = false;
+        construction.solvingStarted(solverScope);
+        local.solvingStarted(solverScope);
     }
 
     public void solvingEnded(DefaultSolverScope<Solution_> solverScope) {

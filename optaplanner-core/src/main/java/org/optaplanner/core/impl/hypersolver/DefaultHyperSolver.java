@@ -26,7 +26,7 @@ public class DefaultHyperSolver<Solution_> extends DefaultSolver<Solution_> {
                          BestSolutionRecaller<Solution_> bestSolutionRecaller, BasicPlumbingTermination basicPlumbingTermination, Termination termination,
                               HyperSolverSwitcher<Solution_> switcher, HyperSolverScope<Solution_> solverScope) {
         super(environmentMode, randomFactory, bestSolutionRecaller, basicPlumbingTermination, termination,
-                new ArrayList<Phase<Solution_>>(), solverScope);
+                new ArrayList<>(), solverScope);
         this.switcher = switcher;
         switcher.setSolverPhaseLifecycleSupport(phaseLifecycleSupport);
     }
@@ -50,6 +50,7 @@ public class DefaultHyperSolver<Solution_> extends DefaultSolver<Solution_> {
     @Override
     public void solvingStarted(DefaultSolverScope<Solution_> solverScope) {
         super.solvingStarted(solverScope);
+        ((HyperSolverScope<Solution_>) solverScope).setRestartSolutionFromBestSolution();
         switcher.solvingStarted(solverScope);
     }
 
@@ -59,6 +60,7 @@ public class DefaultHyperSolver<Solution_> extends DefaultSolver<Solution_> {
             Phase<Solution_> phase = switcher.switchToNextPhase((HyperSolverScope<Solution_>)solverScope);
             // TODO gérer la récupération de data pour le evaluator
             phase.solve(solverScope);
+            phaseList.add(phase);
             switcher.processNewPhase((HyperSolverScope<Solution_>)solverScope);
         }
     }
