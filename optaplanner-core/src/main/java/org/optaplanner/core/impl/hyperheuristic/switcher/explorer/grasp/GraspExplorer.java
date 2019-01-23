@@ -1,7 +1,15 @@
 package org.optaplanner.core.impl.hyperheuristic.switcher.explorer.grasp;
 
 import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicPhaseConfig;
+import org.optaplanner.core.config.constructionheuristic.ConstructionHeuristicType;
+import org.optaplanner.core.config.constructionheuristic.placer.QueuedEntityPlacerConfig;
 import org.optaplanner.core.config.heuristic.policy.HeuristicConfigPolicy;
+import org.optaplanner.core.config.heuristic.selector.common.SelectionCacheType;
+import org.optaplanner.core.config.heuristic.selector.common.SelectionOrder;
+import org.optaplanner.core.config.heuristic.selector.entity.EntitySelectorConfig;
+import org.optaplanner.core.config.heuristic.selector.entity.EntitySorterManner;
+import org.optaplanner.core.config.heuristic.selector.move.MoveSelectorConfig;
+import org.optaplanner.core.config.heuristic.selector.move.generic.ChangeMoveSelectorConfig;
 import org.optaplanner.core.config.localsearch.LocalSearchPhaseConfig;
 import org.optaplanner.core.config.solver.termination.TerminationConfig;
 import org.optaplanner.core.impl.hyperheuristic.scope.HyperHeuristicPhaseScope;
@@ -12,6 +20,8 @@ import org.optaplanner.core.impl.solver.recaller.BestSolutionRecaller;
 import org.optaplanner.core.impl.solver.scope.DefaultSolverScope;
 import org.optaplanner.core.impl.solver.termination.Termination;
 
+import java.util.Collections;
+
 public class GraspExplorer<Solution_> implements Explorer<Solution_> {
 
     private Boolean localPhase = false;
@@ -21,7 +31,14 @@ public class GraspExplorer<Solution_> implements Explorer<Solution_> {
     public GraspExplorer(HeuristicConfigPolicy configPolicy,
                          BestSolutionRecaller bestSolutionRecaller,
                          Termination solverTermination) {
+        configPolicy.setEntitySorterManner(EntitySorterManner.NONE);
         ConstructionHeuristicPhaseConfig constructionHeuristicPhaseConfig = new ConstructionHeuristicPhaseConfig();
+        QueuedEntityPlacerConfig queuedEntityPlacerConfig = new QueuedEntityPlacerConfig();
+        EntitySelectorConfig entitySelectorConfig = new EntitySelectorConfig();
+        entitySelectorConfig.setCacheType(SelectionCacheType.PHASE);
+        entitySelectorConfig.setSelectionOrder(SelectionOrder.SHUFFLED);
+        queuedEntityPlacerConfig.setEntitySelectorConfig(entitySelectorConfig);
+        constructionHeuristicPhaseConfig.setEntityPlacerConfig(queuedEntityPlacerConfig);
         this.construction = constructionHeuristicPhaseConfig.buildPhase(1, configPolicy,
                 bestSolutionRecaller, solverTermination);
         LocalSearchPhaseConfig localSearchPhaseConfig = new LocalSearchPhaseConfig();
