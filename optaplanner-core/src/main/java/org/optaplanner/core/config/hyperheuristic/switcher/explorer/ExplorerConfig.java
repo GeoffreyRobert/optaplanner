@@ -55,8 +55,8 @@ public class ExplorerConfig extends AbstractConfig<ExplorerConfig> {
 
     public Explorer buildExplorer(HeuristicConfigPolicy configPolicy,
                                   BestSolutionRecaller bestSolutionRecaller,
-                                  Termination termination) {
-        return new GraspExplorer(configPolicy, bestSolutionRecaller, termination);
+                                  Termination solverTermination) {
+        return new GraspExplorer(configPolicy, bestSolutionRecaller, solverTermination);
     }
 
     @Override

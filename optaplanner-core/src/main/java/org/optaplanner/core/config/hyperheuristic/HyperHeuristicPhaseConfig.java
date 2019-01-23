@@ -25,6 +25,7 @@ import org.optaplanner.core.impl.solver.recaller.BestSolutionRecaller;
 import org.optaplanner.core.impl.solver.termination.BasicPlumbingTermination;
 import org.optaplanner.core.impl.solver.termination.Termination;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
@@ -71,7 +72,8 @@ public class HyperHeuristicPhaseConfig extends PhaseConfig<HyperHeuristicPhaseCo
                 phaseIndex, solverConfigPolicy.getLogIndentation(), bestSolutionRecaller,
                 buildPhaseTermination(phaseConfigPolicy, solverTermination));
         phase.setSwitcher(buildSwitcher(phaseConfigPolicy, bestSolutionRecaller,
-                phase.getTermination()));
+                solverTermination));
+        phase.setPhaseList(new ArrayList<>());
         EnvironmentMode environmentMode = phaseConfigPolicy.getEnvironmentMode();
         if (environmentMode.isNonIntrusiveFullAsserted()) {
             phase.setAssertStepScoreFromScratch(true);
@@ -84,11 +86,11 @@ public class HyperHeuristicPhaseConfig extends PhaseConfig<HyperHeuristicPhaseCo
     }
 
     protected HyperHeuristicSwitcher buildSwitcher(HeuristicConfigPolicy configPolicy,
-                                                BestSolutionRecaller bestSolutionRecaller, Termination termination) {
+                                                BestSolutionRecaller bestSolutionRecaller, Termination solverTermination) {
         Evaluator evaluator = buildEvaluator(configPolicy);
-        Explorer explorer = buildExplorer(configPolicy, bestSolutionRecaller, termination);
+        Explorer explorer = buildExplorer(configPolicy, bestSolutionRecaller, solverTermination);
         return new HyperHeuristicSwitcher(configPolicy.getLogIndentation(),
-                termination, evaluator, explorer);
+                solverTermination, evaluator, explorer);
     }
 
     protected Evaluator buildEvaluator(HeuristicConfigPolicy configPolicy) {
@@ -116,7 +118,7 @@ public class HyperHeuristicPhaseConfig extends PhaseConfig<HyperHeuristicPhaseCo
     }
 
     protected Explorer buildExplorer (HeuristicConfigPolicy configPolicy, BestSolutionRecaller bestSolutionRecaller,
-                                      Termination termination) {
+                                      Termination solverTermination) {
         ExplorerConfig explorerConfig_;
         if (explorerConfig != null) {
             if (hyperHeuristicType != null) {
@@ -137,7 +139,7 @@ public class HyperHeuristicPhaseConfig extends PhaseConfig<HyperHeuristicPhaseCo
                             + ") is not implemented.");
             }
         }
-        return explorerConfig_.buildExplorer(configPolicy, bestSolutionRecaller, termination);
+        return explorerConfig_.buildExplorer(configPolicy, bestSolutionRecaller, solverTermination);
     }
 
     @Override

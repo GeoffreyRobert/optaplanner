@@ -20,14 +20,14 @@ public class GraspExplorer<Solution_> implements Explorer<Solution_> {
 
     public GraspExplorer(HeuristicConfigPolicy configPolicy,
                          BestSolutionRecaller bestSolutionRecaller,
-                         Termination termination) {
+                         Termination solverTermination) {
         ConstructionHeuristicPhaseConfig constructionHeuristicPhaseConfig = new ConstructionHeuristicPhaseConfig();
         this.construction = constructionHeuristicPhaseConfig.buildPhase(1, configPolicy,
-                bestSolutionRecaller, termination);
+                bestSolutionRecaller, solverTermination);
         LocalSearchPhaseConfig localSearchPhaseConfig = new LocalSearchPhaseConfig();
         localSearchPhaseConfig.setTerminationConfig(new TerminationConfig().withUnimprovedStepCountLimit(10));
         this.local = localSearchPhaseConfig.buildPhase(2, configPolicy,
-                bestSolutionRecaller, termination);
+                bestSolutionRecaller, solverTermination);
     }
 
     public Phase<Solution_> getConstruction() {

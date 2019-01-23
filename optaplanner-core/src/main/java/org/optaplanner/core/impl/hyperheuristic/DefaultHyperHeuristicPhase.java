@@ -31,6 +31,14 @@ public class DefaultHyperHeuristicPhase<Solution_> extends AbstractPhase<Solutio
         super(phaseIndex, logIndentation, bestSolutionRecaller, termination);
     }
 
+    public List<Phase<Solution_>> getPhaseList() {
+        return phaseList;
+    }
+
+    public void setPhaseList(List<Phase<Solution_>> phaseList) {
+        this.phaseList = phaseList;
+    }
+
     public HyperHeuristicSwitcher<Solution_> getSwitcher() {
         return switcher;
     }
