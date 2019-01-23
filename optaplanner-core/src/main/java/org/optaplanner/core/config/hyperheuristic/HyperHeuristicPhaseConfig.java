@@ -44,6 +44,14 @@ public class HyperHeuristicPhaseConfig extends PhaseConfig<HyperHeuristicPhaseCo
     // Constructors and simple getters/setters
     // ************************************************************************
 
+    public HyperHeuristicType getHyperHeuristicType() {
+        return hyperHeuristicType;
+    }
+
+    public void setHyperHeuristicType(HyperHeuristicType hyperHeuristicType) {
+        this.hyperHeuristicType = hyperHeuristicType;
+    }
+
     public EvaluatorConfig getEvaluatorConfig() {
         return evaluatorConfig;
     }

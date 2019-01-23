@@ -20,6 +20,7 @@ import org.optaplanner.core.impl.solver.DefaultSolver;
 import org.optaplanner.core.impl.testdata.domain.TestdataEntity;
 import org.optaplanner.core.impl.testdata.domain.TestdataSolution;
 import org.optaplanner.core.impl.testdata.domain.TestdataValue;
+import org.optaplanner.core.impl.testdata.domain.immovable.TestdataImmovableSolution;
 import org.optaplanner.core.impl.testdata.util.PlannerTestUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -61,4 +62,5 @@ public class DefaultHyperHeuristicPhaseTest {
         assertCode("e3", solvedE3);
         assertNotNull(solvedE3.getValue());
     }
+
 }

@@ -8,6 +8,7 @@ import org.optaplanner.core.config.util.ConfigUtils;
 import org.optaplanner.core.impl.hyperheuristic.switcher.evaluator.Evaluator;
 import org.optaplanner.core.impl.hyperheuristic.switcher.evaluator.NoScoreEvaluator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @XStreamAlias("EvaluatorConfig")
@@ -16,7 +17,8 @@ public class EvaluatorConfig extends AbstractConfig<EvaluatorConfig> {
     @XStreamAlias("evaluatorType")
     private List<EvaluatorType> evaluatorTypeList = null;
 
-    private EvaluationFunction evaluationFunction = null;
+    // TODO maybe add some sort of external function
+    // private EvaluationFunction evaluationFunction = null;
 
     // ************************************************************************
     // Simple getters/setters
@@ -30,34 +32,46 @@ public class EvaluatorConfig extends AbstractConfig<EvaluatorConfig> {
         this.evaluatorTypeList = evaluatorTypeList;
     }
 
-    public EvaluationFunction getEvaluationFunction() {
-        return evaluationFunction;
-    }
-
-    public void setEvaluationFunction(EvaluationFunction evaluationFunction) {
-        this.evaluationFunction = evaluationFunction;
-    }
-
     // ************************************************************************
     // With methods
     // ************************************************************************
 
-    public EvaluatorConfig withEvaluationFunction(EvaluationFunction evaluationFunction) {
-        this.evaluationFunction = evaluationFunction;
-        return this;
-    }
 
     // ************************************************************************
     // Builder methods
     // ************************************************************************
 
     public Evaluator buildEvaluator(HeuristicConfigPolicy configPolicy) {
-        return new NoScoreEvaluator();
+        List<Evaluator> evaluatorList = new ArrayList<>();
+        if (evaluatorTypeList != null && evaluatorTypeList.contains(EvaluatorType.NO_SCORE)) {
+            NoScoreEvaluator evaluator = new NoScoreEvaluator();
+            evaluatorList.add(evaluator);
+        }
+        if (evaluatorList.size() == 1) {
+            return evaluatorList.get(0);
+        } else if (evaluatorList.size() > 1) {
+            throw new IllegalArgumentException("The evaluator does not yet support composition.\n");
+            // TODO Implement CompositeEvaluator
+            // return new CompositeEvaluator(evaluatorList);
+        } else {
+            throw new IllegalArgumentException("The evaluator does not specify any SUPPORTED evaluatorType (" + evaluatorTypeList
+                    + ") or other evaluator property.\n");
+        }
     }
 
     @Override
     public void inherit(EvaluatorConfig inheritedConfig) {
-        evaluationFunction = ConfigUtils.inheritOverwritableProperty(evaluationFunction,
-                inheritedConfig.getEvaluationFunction());
+        if (evaluatorTypeList == null) {
+            evaluatorTypeList = inheritedConfig.getEvaluatorTypeList();
+        } else {
+            List<EvaluatorType> inheritedEvaluatorTypeList = inheritedConfig.getEvaluatorTypeList();
+            if (inheritedEvaluatorTypeList != null) {
+                for (EvaluatorType evaluatorType : inheritedEvaluatorTypeList) {
+                    if (!evaluatorTypeList.contains(evaluatorType)) {
+                        evaluatorTypeList.add(evaluatorType);
+                    }
+                }
+            }
+        }
     }
 }

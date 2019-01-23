@@ -1,9 +1,10 @@
 package org.optaplanner.core.impl.hyperheuristic.switcher.evaluator;
 
+import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.impl.hyperheuristic.scope.HyperHeuristicPhaseScope;
 
-public interface Evaluator<Solution_> {
+public interface Evaluator {
 
-    public void evaluateLastPhase(HyperHeuristicPhaseScope<Solution_> solverScope);
+    int evaluateLastPhase(HyperHeuristicPhaseScope phaseScope);
 
 }

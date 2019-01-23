@@ -1,11 +1,12 @@
 package org.optaplanner.core.impl.hyperheuristic.switcher.evaluator;
 
+import org.optaplanner.core.api.score.Score;
 import org.optaplanner.core.impl.hyperheuristic.scope.HyperHeuristicPhaseScope;
 
-public class NoScoreEvaluator<Solution_> implements Evaluator<Solution_> {
+public class NoScoreEvaluator implements Evaluator {
 
-    public void evaluateLastPhase(HyperHeuristicPhaseScope<Solution_> solverScope) {
-        solverScope.setEvaluationCount(solverScope.getEvaluationCount() + 1);
+    public int evaluateLastPhase(HyperHeuristicPhaseScope phaseScope) {
+        return 0;
     }
 
 }
